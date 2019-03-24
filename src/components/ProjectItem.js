@@ -4,6 +4,7 @@ import pen from "../image/pen.png";
 import del from "../image/delete.png";
 import zoom from "../image/zoom.png";
 import { connect } from "react-redux";
+import firebase from "../firebase/firebaseConfig";
 
 class ProjectItem extends Component {
   constructor() {
@@ -14,41 +15,56 @@ class ProjectItem extends Component {
   }
   render() {
     const { projet } = this.props;
+    console.log(projet);
     return (
-      <tr>
-        <td>{projet.nom_projet}</td>
-        <td>{projet.description}</td>
-        <td>{projet.date_debut}</td>
-        <td>{projet.duree} Jours</td>
-        <td>{projet.chef_projet}</td>
+      <tr key={this.props.projet.id}>
+        <td>{this.props.projet.nom_projet}</td>
+        <td>{this.props.projet.description}</td>
+        <td>{this.props.projet.date_debut}</td>
+        <td>{this.props.projet.duree}</td>
+        <td>{this.props.projet.chef_projet}</td>
+
         <td>
           {/*passing id */}
-          <Link to={"/taches/" + projet._id}>
-            <img
-              alt="details"
-              src={zoom}
-              width="30"
-              onClick={this.onClickDET}
-            />
-          </Link>
+
+          <img
+            alt="details"
+            src={zoom}
+            width="30"
+            onClick={console.log("taches")}
+          />
         </td>
         <td>
           <img
             alt="delete"
             src={del}
             width="30"
-            onClick={e => {
-              console.log("delete");
-              this.props.dispatch({
-                type: "REMOVE_PROJECT",
-                projet: this.props.projet
-              });
+            onClick={() => {
+              console.log("supp");
+              let currentComponent = this;
+              let db = firebase.firestore();
+              var docRef = db.collection("projets");
+              docRef
+                .doc(this.props.projet.id)
+                .delete()
+                .then(function() {
+                  currentComponent.props.removeProject(this.props.projet.id);
+                  console.log("Document successfully deleted!");
+                })
+                .catch(function(error) {
+                  console.error("Error removing document: ", error);
+                });
             }}
           />
         </td>
         <td>
-          <Link to={"/mod/" + projet.nom_projet}>
-            <img alt="edit" src={pen} width="30" onClick={this.onClickMOD} />
+          <Link to={"/mod/" + this.props.projet.id}>
+            <img
+              alt="edit"
+              src={pen}
+              width="30"
+              onClick={console.log("modifier")}
+            />
           </Link>
         </td>
       </tr>

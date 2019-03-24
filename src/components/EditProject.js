@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import firebase from "../firebase/firebaseConfig";
 import { editProject } from "../actions";
 class EditProject extends Component {
   constructor(props) {
     super(props);
+
+    console.log(this.props.project);
     const p = this.props.project[0];
     this.state = {
       nom_projet: p.nom_projet,
@@ -17,9 +20,7 @@ class EditProject extends Component {
   render() {
     const cssbutton = { marginTop: 20 };
     const cssbutton2 = { width: 500 };
-    const p = this.props.project[0];
-    console.log(p);
-
+   
     return (
       <div className="text-center cssbutton" style={cssbutton2}>
         <form className="form-signin">
@@ -72,6 +73,26 @@ class EditProject extends Component {
                 this.props.project[0].nom_projet,
                 this.state
               );
+              let db = firebase.firestore();
+              var docRef = db
+                .collection("projets")
+                .doc(this.props.project[0].id);
+
+              docRef
+                .update({
+                  nom_projet: this.state.nom_projet,
+                  duree: this.state.duree,
+                  date_debut: this.state.date_debut,
+                  description: this.state.description,
+                  chef_projet: this.state.chef_projet
+                })
+                .then(function() {
+                  console.log("Document successfully updated!");
+                })
+                .catch(function(error) {
+                  // The document probably doesn't exist.
+                  console.error("Error updating document: ", error);
+                });
 
               this.props.history.push("/projets");
             }}
@@ -89,7 +110,7 @@ class EditProject extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    project: state.filter(i => i.nom_projet === ownProps.match.params.id)
+    project: state.filter(i => i.id === ownProps.match.params.id)
   };
 };
 const mapDispatchToState = {

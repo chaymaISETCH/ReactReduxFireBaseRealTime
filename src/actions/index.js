@@ -5,7 +5,7 @@ import {
   EDIT_PROJECT
 } from "./types";
 export const addProject = project => ({ type: ADD_PROJECT, project });
-export const removeProject = project => ({ type: REMOVE_PROJECT, project });
+export const removeProject = id => ({ type: REMOVE_PROJECT, id });
 export const editProject = (id, project) => ({
   type: EDIT_PROJECT,
   id,

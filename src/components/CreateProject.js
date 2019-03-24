@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { getProjectsAction } from "../actions";
+import firebase from "../firebase/firebaseConfig";
 import { connect } from "react-redux";
 class CreateProject extends Component {
   constructor(props) {
@@ -24,7 +26,7 @@ class CreateProject extends Component {
             className="form-control"
             placeholder="Nom"
             required
-            onChange={e =>
+            onChange={e => 
               this.setState({
                 nom_projet: e.target.value
               })
@@ -59,6 +61,7 @@ class CreateProject extends Component {
             className="btn btn-lg btn-primary btn-block"
             onClick={e => {
               e.preventDefault();
+
               let projet = {
                 nom_projet: this.state.nom_projet,
                 description: this.state.description,
@@ -66,11 +69,32 @@ class CreateProject extends Component {
                 duree: this.state.duree,
                 chef_projet: this.state.chef_projet
               };
-              this.props.dispatch({
-                type: "ADD_PROJECT",
-                projet
+              let db = firebase.firestore();
+              // onSnapShot Event
+              /* const projects = [];
+              db.collection("projets").onSnapshot(function(doc) {
+                console.log("event firestore");
+                console.log("Current data: ", doc);
+                doc.forEach(d => {
+                  console.log(d.data());
+                  projects.push(d.data());
+                });
               });
-              console.log(this.state);
+
+              this.props.getProjectsAction(projects);*/
+              // Add a second document with a generated ID.
+              db.collection("projets")
+                .add({
+                  ...projet
+                })
+                .then(function(docRef) {
+                  console.log("adding document to firestore" + docRef);
+                })
+                .catch(function(error) {
+                  console.error("Error adding document: ", error);
+                });
+
+              console.log(this.props);
 
               this.props.history.push("/projets");
             }}
@@ -85,5 +109,15 @@ class CreateProject extends Component {
     );
   }
 }
-
-export default connect()(CreateProject);
+const mapStateToProps = (state, ownProps) => {
+  return {
+    project: state
+  };
+};
+const mapDispatchToState = {
+  getProjectsAction
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToState
+)(CreateProject);

@@ -4,7 +4,6 @@ import Content from "./ProjectContent";
 import TaskContent from "./TaskContent";
 import CreateProject from "./CreateProject";
 import EditTask from "./EditProject";
-import Header from "./Header";
 
 export default class Nav extends Component {
   render() {
@@ -19,10 +18,6 @@ export default class Nav extends Component {
             </li>
           </ul>
 
-          <Route path="/signIn" exact component={Header} />
-          <Route path="/header" exact component={Header} />
-          <Route path="/edit/:id" component={Header} />
-          <Route path="/createTask" component={Header} />
           <Route path="/projets" component={Content} />
           <Route path="/mod/:id" component={EditTask} />
           <Route path="/taches/:id" component={TaskContent} />

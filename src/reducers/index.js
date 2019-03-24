@@ -7,20 +7,23 @@ import {
 const rootReducer = (state = [], action) => {
   switch (action.type) {
     /****************************/
-    case GET_PROJECTS:
+    case GET_PROJECTS: {
+      console.log("get projects");
       return action.projects;
+    }
     //***************************/
+    //useless
     case ADD_PROJECT: {
       console.log("add reducer");
       return state.concat(action.projet);
     }
     /****************************/
     case REMOVE_PROJECT: {
-      return state.filter(
-        projet => projet.nom_projet !== action.projet.nom_projet
-      );
+      console.log("remove reducer");
+      return state.filter(projet => projet.id !== action.id);
     }
     /***************************/
+    //useless
     case EDIT_PROJECT: {
       return state.map(p => {
         console.log("reducer");
