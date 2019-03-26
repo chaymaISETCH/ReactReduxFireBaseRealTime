@@ -1,6 +1,9 @@
 import firebase from "../firebase/firebaseConfig";
 import { getProjectsAction, removeProject } from "../actions";
 import React from "react";
+import pen from "../image/pen.png";
+import del from "../image/delete.png";
+import zoom from "../image/zoom.png";
 import Item from "./ProjectItem";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
@@ -14,7 +17,16 @@ class ProjectContent extends React.Component {
     };
     this.getProjets = this.getProjets.bind(this);
   }
-
+  //************************************************* */
+  componentWillUnmount() {
+    let db = firebase.firestore();
+    var unsubscribe = db.collection("projets").onSnapshot(function() {
+      console.log("Stop listening to changes");
+    });
+    // ...
+    // Stop listening to changes
+    unsubscribe();
+  }
   //*********************************** */
   componentDidMount() {
     console.log("did mount");
@@ -26,7 +38,26 @@ class ProjectContent extends React.Component {
     let db = firebase.firestore();
     var docRef = db.collection("projets");
     let projects = [];
-
+    //************************EVENT */
+    docRef.onSnapshot(function(snapshot) {
+      snapshot.docChanges().forEach(function(change) {
+        if (change.type === "added") {
+          console.log("add event");
+          console.log("New city: ", change.doc.data());
+        }
+        if (change.type === "modified") {
+          console.log("edit event");
+          console.log("Modified city: ", change.doc.data());
+        }
+        if (change.type === "removed") {
+          console.log("remove event");
+          let p = { ...change.doc.data(), id: change.doc.id };
+          console.log("Removed city: ", p);
+          currentComponent.props.removeProject(change.doc.id);
+        }
+      });
+    });
+    //******************************* */
     docRef
       .get()
       .then(function(doc) {
@@ -124,7 +155,57 @@ class ProjectContent extends React.Component {
 
               <tbody>
                 {this.props.projects.map(item => (
-                  <Item key={item.id} projet={item} />
+                  <tr key={item.id}>
+                    <td>{item.nom_projet}</td>
+                    <td>{item.description}</td>
+                    <td>{item.date_debut}</td>
+                    <td>{item.duree}</td>
+                    <td>{item.chef_projet}</td>
+
+                    <td>
+                      {/*passing id */}
+
+                      <img
+                        alt="details"
+                        src={zoom}
+                        width="30"
+                        onClick={console.log("taches")}
+                      />
+                    </td>
+                    <td>
+                      <img
+                        alt="delete"
+                        src={del}
+                        width="30"
+                        onClick={() => {
+                          console.log("supp");
+                          let currentComponent = this;
+                          let db = firebase.firestore();
+                          var docRef = db.collection("projets");
+                          docRef
+                            .doc(item.id)
+                            .delete()
+                            .then(function() {
+                              currentComponent.props.removeProject(item.id);
+                              console.log("Document successfully deleted!");
+                            })
+                            .catch(function(error) {
+                              console.error("Error removing document: ", error);
+                            });
+                        }}
+                      />
+                    </td>
+                    <td>
+                      <Link to={"/mod/" + item.id}>
+                        <img
+                          alt="edit"
+                          src={pen}
+                          width="30"
+                          onClick={console.log("modifier")}
+                        />
+                      </Link>
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>

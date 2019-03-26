@@ -12,7 +12,26 @@ class ProjectItem extends Component {
     this.state = {
       loading: true
     };
+    this.get = this.get.bind();
   }
+
+  get() {
+    console.log("supp");
+    let currentComponent = this;
+    let db = firebase.firestore();
+    var docRef = db.collection("projets");
+    docRef
+      .doc(this.props.projet.id)
+      .delete()
+      .then(function() {
+        currentComponent.props.removeProject(this.props.projet.id);
+        console.log("Document successfully deleted!");
+      })
+      .catch(function(error) {
+        console.error("Error removing document: ", error);
+      });
+  }
+
   render() {
     const { projet } = this.props;
     console.log(projet);
