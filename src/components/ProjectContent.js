@@ -1,5 +1,5 @@
 import firebase from "../firebase/firebaseConfig";
-import { getProjectsAction, removeProject } from "../actions";
+import { getProjectsAction, removeProject,addProject } from "../actions";
 import React from "react";
 import pen from "../image/pen.png";
 import del from "../image/delete.png";
@@ -43,16 +43,21 @@ class ProjectContent extends React.Component {
       snapshot.docChanges().forEach(function(change) {
         if (change.type === "added") {
           console.log("add event");
-          console.log("New city: ", change.doc.data());
+          
+        
+
+          let p = { ...change.doc.data(), id: change.doc.id };
+          console.log("New project: ", p);
+          currentComponent.props.addProject(p);
         }
         if (change.type === "modified") {
-          console.log("edit event");
-          console.log("Modified city: ", change.doc.data());
+          console.log("edit project");
+          console.log("Modified project: ", change.doc.data());
         }
         if (change.type === "removed") {
-          console.log("remove event");
+          console.log("remove project");
           let p = { ...change.doc.data(), id: change.doc.id };
-          console.log("Removed city: ", p);
+          console.log("Removed project: ", p);
           currentComponent.props.removeProject(change.doc.id);
         }
       });
@@ -179,14 +184,13 @@ class ProjectContent extends React.Component {
                         width="30"
                         onClick={() => {
                           console.log("supp");
-                          let currentComponent = this;
+
                           let db = firebase.firestore();
                           var docRef = db.collection("projets");
                           docRef
                             .doc(item.id)
                             .delete()
                             .then(function() {
-                              currentComponent.props.removeProject(item.id);
                               console.log("Document successfully deleted!");
                             })
                             .catch(function(error) {
@@ -217,7 +221,8 @@ class ProjectContent extends React.Component {
 }
 const mapDispatchToState = {
   getProjectsAction,
-  removeProject
+  removeProject,
+  addProject
 };
 
 const mapStateToProps = state => {

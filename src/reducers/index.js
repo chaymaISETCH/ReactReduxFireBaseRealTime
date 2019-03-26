@@ -15,7 +15,11 @@ const rootReducer = (state = [], action) => {
     //useless
     case ADD_PROJECT: {
       console.log("add reducer");
-      return state.concat(action.projet);
+      console.log(action);
+
+      let newState = state.concat(action.project);
+      console.log(newState);
+      return newState;
     }
     /****************************/
     case REMOVE_PROJECT: {
